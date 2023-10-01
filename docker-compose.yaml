@@ -1,0 +1,60 @@
+﻿version: '3.9'
+services:
+  tempo:
+    image: grafana/tempo:2.2.2
+    networks:
+      - infrastructure
+    command:
+      - --config.file=/etc/tempo/tempo.yml
+    configs:
+      - source: tempo_config
+        target: /etc/tempo/tempo.yml
+    volumes:
+      - tempo:/var/tempo
+    environment:
+      ACCESS_KEY: ${TEMPO_ACCESS_KEY}
+      SECRET_KEY: ${TEMPO_SECRET_KEY}
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == manager"
+      rollback_config:
+        parallelism: 0
+        failure_action: continue
+        order: stop-first
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+        order: stop-first
+      labels:
+        prometheus.job: tempo
+        prometheus.port: 3200
+        prometheus.path: /metrics
+    logging:
+      driver: loki
+      options:
+        loki-url: http://192.168.50.19:3100/loki/api/v1/push
+        loki-retries: 5
+        loki-batch-size: 20
+        loki-tenant-id: 1
+        loki-external-labels: "job=tempo"
+
+configs:
+  tempo_config:
+    file: config/tempo.yml
+    name: tempo_config
+
+volumes:
+  tempo:
+    name: tempo
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.50.19,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14"
+      device: ":/share/docker/tempo"
+
+networks:
+  infrastructure:
+    name: infrastructure
+    external: true

@@ -1,0 +1,66 @@
+﻿server:
+  http_listen_port: 3200
+  http_server_read_timeout: 600s
+  http_server_write_timeout: 600s
+  grpc_listen_port: 3201
+  grpc_server_max_recv_msg_size: 100000000
+  grpc_server_max_send_msg_size: 150000000
+  log_format: json
+  log_level: info
+
+query_frontend:
+  search:
+    duration_slo: 5s
+    throughput_bytes_slo: 1.073741824e+09
+  trace_by_id:
+    duration_slo: 5s
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        http: 
+        grpc:
+    jaeger:
+      protocols:
+        thrift_http:
+        grpc:
+        thrift_binary:
+        thrift_compact:
+
+ingester:
+  max_block_duration: 60m
+
+compactor:
+  compaction:
+    block_retention: 24h
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+      cluster: docker-compose
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
+
+storage:
+  trace:
+    backend: s3
+    wal:
+      path: /var/tempo/wal
+    s3:
+      endpoint: minio.:9000
+      bucket: loki
+      region: darlinghurst
+      insecure: true
+      forcepathstyle: true            
+      access_key: ${ACCESS_KEY}
+      secret_key: ${SECRET_KEY}
+
+overrides:
+  metrics_generator_processors: 
+    - service-graphs 
+    - span-metrics
