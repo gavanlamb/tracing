@@ -53,7 +53,7 @@ storage:
       path: /var/tempo/wal
     s3:
       endpoint: minio.:9000
-      bucket: loki
+      bucket: tempo
       region: darlinghurst
       insecure: true
       forcepathstyle: true            
