@@ -33,12 +33,7 @@ services:
         prometheus.port: 3200
         prometheus.path: /metrics
     logging:
-      driver: loki
       options:
-        loki-url: http://192.168.50.19:3100/loki/api/v1/push
-        loki-retries: 5
-        loki-batch-size: 20
-        loki-tenant-id: 1
         loki-external-labels: "job=tempo"
 
 configs:
