@@ -52,9 +52,11 @@ storage:
     wal:
       path: /var/tempo/wal
     s3:
-      s3: http://tempo:yL928xsbmMSulEe9@minio.:9000/tempo
-      s3forcepathstyle: true
+      endpoint: tempo:yL928xsbmMSulEe9@minio.:9000
+      bucket: tempo
       region: darlinghurst
+      insecure: true
+      forcepathstyle: true
 
 overrides:
   metrics_generator_processors: 
