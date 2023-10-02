@@ -5,6 +5,7 @@ services:
     networks:
       - infrastructure
     command:
+      - -config.expand-env=true
       - --config.file=/etc/tempo/tempo.yml
     configs:
       - source: tempo_config
@@ -12,8 +13,8 @@ services:
     volumes:
       - tempo:/var/tempo
     environment:
-      ACCESS_KEY: ${TEMPO_ACCESS_KEY}
-      SECRET_KEY: ${TEMPO_SECRET_KEY}
+      MINIO_USERNAME: ${MINIO_TEMPO_USERNAME}
+      MINIO_PASSWORD: ${MINIO_TEMPO_PASSWORD}
     deploy:
       replicas: 1
       placement:

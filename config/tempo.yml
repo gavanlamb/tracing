@@ -57,9 +57,8 @@ storage:
       region: darlinghurst
       insecure: true
       forcepathstyle: true
-      accessKey: tempo
-      accessSecret: yL928xsbmMSulEe9
-      
+      access_key: ${MINIO_USERNAME}
+      secret_key: ${MINIO_PASSWORD}
 
 overrides:
   metrics_generator_processors: 
