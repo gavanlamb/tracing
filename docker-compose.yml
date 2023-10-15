@@ -20,6 +20,7 @@ services:
       placement:
         constraints:
           - "node.role==manager"
+          - "node.labels.os==linux"
       rollback_config:
         parallelism: 0
         failure_action: continue
