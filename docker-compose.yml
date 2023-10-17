@@ -3,7 +3,7 @@ services:
   tempo:
     image: grafana/tempo:2.2.2
     networks:
-      - infrastructure
+      - services
     command:
       - -config.expand-env=true
       - --config.file=/etc/tempo/tempo.yml
@@ -52,6 +52,6 @@ volumes:
       device: ":/share/docker/tempo"
 
 networks:
-  infrastructure:
-    name: infrastructure
+  services:
+    name: services
     external: true
