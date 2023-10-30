@@ -13,8 +13,8 @@ services:
     volumes:
       - tempo:/var/tempo
     environment:
-      MINIO_USERNAME: ${MINIO_TEMPO_USERNAME}
-      MINIO_PASSWORD: ${MINIO_TEMPO_PASSWORD}
+      MINIO_USERNAME: ${MINIO_USER_SERVICE_ACCOUNT_ACCESSKEY}
+      MINIO_PASSWORD: ${MINIO_USER_SERVICE_ACCOUNT_SECRETKEY}
     deploy:
       replicas: 1
       placement:
@@ -37,8 +37,47 @@ services:
     logging:
       options:
         loki-external-labels: "job=tempo"
+  create-bucket:
+    image: ubuntu:22.04
+    entrypoint: >
+      bash -c "cp /etc/minio/create-bucket.sh /etc/create-bucket.sh 
+      && chmod u+x /etc/create-bucket.sh
+      && cd /etc/
+      && ./create-bucket.sh"
+    configs:
+      - source: tempo_create_bucket
+        target: /etc/minio/create-bucket.sh
+    networks:
+      - services
+    environment:
+      ADMIN_USERNAME: ${MINIO_ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${MINIO_ADMIN_PASSWORD}
+      DEPLOYMENT_NAME: gavanlamb
+      DEPLOYMENT_URL: http://minio:9000
+      DEPLOYMENT_REGION: darlinghurst
+      NEW_BUCKET_NAME: tempo
+      NEW_GROUP_NAME: tempo
+      NEW_POLICY_PREFIX: tempo
+      NEW_USER_NAME: tempo
+      NEW_USER_PASSWORD: ${MINIO_USER_PASSWORD}
+      NEW_USER_SERVICE_ACCOUNT_ACCESSKEY: ${MINIO_USER_SERVICE_ACCOUNT_ACCESSKEY}
+      NEW_USER_SERVICE_ACCOUNT_SECRETKEY: ${MINIO_USER_SERVICE_ACCOUNT_SECRETKEY}
+    deploy:
+      mode: replicated
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - "node.role==manager"
+          - "node.platform.os==linux"
+    logging:
+      options:
+        loki-external-labels: "job=tempo-create-bucket"
 
 configs:
+  tempo_create_bucket:
+    file: scripts/create-bucket.sh
+    name: tempo_create_bucket
   tempo_config:
     file: config/tempo.yml
     name: tempo_config
@@ -48,7 +87,7 @@ volumes:
     name: tempo
     driver_opts:
       type: "nfs"
-      o: "addr=192.168.50.19,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14"
+      o: "nfsvers=4,addr=192.168.50.31,rw,noatime,rsize=8192,wsize=8192,tcp"
       device: ":/share/docker/tempo"
 
 networks:
