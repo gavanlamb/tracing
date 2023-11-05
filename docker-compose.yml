@@ -32,7 +32,7 @@ services:
         order: stop-first
       labels:
         prometheus.job: tempo
-        prometheus.port: 3200
+        prometheus.port: 3800
         prometheus.path: /metrics
     logging:
       options:
