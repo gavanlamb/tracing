@@ -38,15 +38,7 @@ services:
       options:
         loki-external-labels: "job=tempo"
   create-bucket:
-    image: ubuntu:22.04
-    entrypoint: >
-      bash -c "cp /etc/minio/create-bucket.sh /etc/create-bucket.sh 
-      && chmod u+x /etc/create-bucket.sh
-      && cd /etc/
-      && ./create-bucket.sh"
-    configs:
-      - source: tempo_create_bucket
-        target: /etc/minio/create-bucket.sh
+    image: gavanlamb/minio-create-bucket:v1.0.0
     networks:
       - services
     environment:
@@ -75,9 +67,6 @@ services:
         loki-external-labels: "job=tempo-create-bucket"
 
 configs:
-  tempo_create_bucket:
-    file: scripts/create-bucket.sh
-    name: tempo_create_bucket
   tempo_config:
     file: config/tempo.yml
     name: tempo_config
