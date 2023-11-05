@@ -45,7 +45,7 @@ services:
       ADMIN_USERNAME: ${MINIO_ADMIN_USERNAME}
       ADMIN_PASSWORD: ${MINIO_ADMIN_PASSWORD}
       DEPLOYMENT_NAME: gavanlamb
-      DEPLOYMENT_URL: http://minio:9000
+      DEPLOYMENT_URL: http://minio:3700
       DEPLOYMENT_REGION: darlinghurst
       NEW_BUCKET_NAME: tempo
       NEW_GROUP_NAME: tempo
